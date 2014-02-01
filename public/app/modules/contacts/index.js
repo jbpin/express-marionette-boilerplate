@@ -1,4 +1,3 @@
-var contact = require('./models/contact');
 var Controller = require('./controllers');
 
 function ContactModule(module, app, backbone, Marionette, $, _){
@@ -13,11 +12,10 @@ function ContactModule(module, app, backbone, Marionette, $, _){
   });
 
   module.addInitializer(function(){
-    var c = new Controller({
-      region: app.mainRegion
-    });
     new module.Router({
-      controller : c
+      controller : new Controller({
+        region: app.mainRegion
+      })
     });
   });
 }
