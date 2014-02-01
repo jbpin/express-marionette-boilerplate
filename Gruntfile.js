@@ -34,7 +34,7 @@ module.exports = function(grunt){
               }
             },
             'backbone.marionette': {
-              path: 'public/bower_components/marionette/lib/backbone.marionette.min.js',
+              path: 'public/bower_components/backbone.marionette/lib/backbone.marionette.min.js',
               exports: 'Marionette',
               depends: {
                 jquery: '$',
