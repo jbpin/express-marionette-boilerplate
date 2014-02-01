@@ -1,6 +1,6 @@
 express-boilerplate
 ===================
 
-Node js express boilerplate - Bootstrap - HTML5 Boilerplate - Consolidate (dust)
+Node js express + Marionette (user borwserify with grunt watch)
 
 
