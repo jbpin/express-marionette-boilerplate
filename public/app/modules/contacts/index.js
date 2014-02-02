@@ -1,4 +1,4 @@
-var Controller = require('./controllers');
+var controllers = require('./controllers');
 
 function ContactModule(module, app, backbone, Marionette, $, _){
   module.on("before:start", function(){
@@ -13,7 +13,7 @@ function ContactModule(module, app, backbone, Marionette, $, _){
 
   module.addInitializer(function(){
     new module.Router({
-      controller : new Controller({
+      controller : new controllers.ContactController({
         region: app.mainRegion
       })
     });

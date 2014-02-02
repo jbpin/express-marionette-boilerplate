@@ -22,35 +22,30 @@ MainApp.start();
 
 module.exports = MainApp;
 },{"./modules/contacts":4,"backbone":"37npV7","backbone.marionette":"QmbIvk","jquery":"bBWYxq","underscore":"II0/qO"}],2:[function(require,module,exports){
+var Marionette = require('backbone.marionette');
 var views = require('../view');
 var models = require('../models');
 
-function displayContact(){
-  console.log("Display contact")
-  var c = new models.contact.ContactModel();
-  var view = new views.Contact({model:c});
-  this.region.show(view);
-}
-
-module.exports = {
-  displayContact: displayContact
-};
-},{"../models":6,"../view":8}],3:[function(require,module,exports){
-var _ = require('underscore');
-var Backbone = require('backbone');
-var Marionette = require('backbone.marionette');
-
-var Controller = Marionette.Controller.extend({
+var ContactController = Marionette.Controller.extend({
   initialize: function(options){
     this.region = options.region;
   }
 });
 
-_.extend(Controller.prototype, require('./contact'));
+ContactController.prototype.displayContact = function(){
+  console.log("Display contact");
+  var c = new models.contact.ContactModel();
+  var view = new views.Contact({model:c});
+  this.region.show(view);
+};
 
-module.exports = Controller;
-},{"./contact":2,"backbone":"37npV7","backbone.marionette":"QmbIvk","underscore":"II0/qO"}],4:[function(require,module,exports){
-var Controller = require('./controllers');
+module.exports = ContactController;
+},{"../models":6,"../view":8,"backbone.marionette":"QmbIvk"}],3:[function(require,module,exports){
+module.exports = {
+  ContactController : require('./contact')
+};
+},{"./contact":2}],4:[function(require,module,exports){
+var controllers = require('./controllers');
 
 function ContactModule(module, app, backbone, Marionette, $, _){
   module.on("before:start", function(){
@@ -65,7 +60,7 @@ function ContactModule(module, app, backbone, Marionette, $, _){
 
   module.addInitializer(function(){
     new module.Router({
-      controller : new Controller({
+      controller : new controllers.ContactController({
         region: app.mainRegion
       })
     });
