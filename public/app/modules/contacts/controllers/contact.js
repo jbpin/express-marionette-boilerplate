@@ -1,10 +1,8 @@
 var views = require('../view');
-var models = require('../models');
 
 function displayContact(){
-  console.log("Display contact")
-  var c = new models.contact.ContactModel();
-  var view = new views.Contact({model:c});
+  var contacts = this.app.request("contact:entities");
+  var view = new views.contact.ContactsView({collection:contacts});
   this.region.show(view);
 }
 

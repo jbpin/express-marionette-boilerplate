@@ -7,7 +7,8 @@ var Marionette = require('backbone.marionette');
 var MainApp = new Backbone.Marionette.Application();
 
 // Modules
-MainApp.module('contacts', require('./modules/contacts'));
+MainApp.module('Entities', require('./entities'));
+MainApp.module('Contacts', require('./modules/contacts'));
 
 
 MainApp.addRegions({
@@ -21,21 +22,83 @@ MainApp.on('initialize:after', function(){
 MainApp.start();
 
 module.exports = MainApp;
-},{"./modules/contacts":4,"backbone":"37npV7","backbone.marionette":"QmbIvk","jquery":"bBWYxq","underscore":"II0/qO"}],2:[function(require,module,exports){
+},{"./entities":3,"./modules/contacts":6,"backbone":"MquU5q","backbone.marionette":"+Zbygn","jquery":"gsUuyK","underscore":"wbFvxb"}],2:[function(require,module,exports){
+var Backbone = require('backbone');
+var Marionette = require('backbone.marionette');
+
+// Model and Collection definition
+var ContactModel = Backbone.Model.extend({
+  idAttribute: "_id",
+  // Default attributes
+  defaults: {
+    _id : 1,
+    name : 'New Contact'
+  },
+
+  // A dummy initialization method
+  initialize: function() {
+    this.on('change', function(){
+      console.log('ContactModel - Values for this model have changed.');
+    });
+  }
+});
+
+var ContactCollection = Backbone.Collection.extend({
+  model: ContactModel
+});
+
+// Controller Definition
+var ContactController = Marionette.Controller.extend({
+  initialize: function(options){
+    this.collection = new ContactCollection([{name : 'Pierre'},{name : 'Paul'},{name : 'Jacques'}]);
+  },
+
+  getContacts : function(){
+    return this.collection;
+  },
+
+  addContact : function(name){
+    var contact = new ContactModel({name:name});
+    this.collection.add(contact);
+    return contact;
+  }
+});
+
+module.exports = {
+  ContactModel : ContactModel,
+  ContactCollection : ContactCollection,
+  ContactController : ContactController
+};
+},{"backbone":"MquU5q","backbone.marionette":"+Zbygn"}],3:[function(require,module,exports){
+var contact = require('./contact');
+
+function EntitiesModule(Entities, App, Backbone, Marionette, $, _){
+
+  var contactController = new contact.ContactController();
+
+  App.reqres.setHandler('contact:entities', function(){
+    return contactController.getContacts();
+  });
+  App.reqres.setHandler('contact:new', function(name){
+    return contactController.addContact(name);
+  });
+
+}
+
+module.exports = EntitiesModule;
+},{"./contact":2}],4:[function(require,module,exports){
 var views = require('../view');
-var models = require('../models');
 
 function displayContact(){
-  console.log("Display contact")
-  var c = new models.contact.ContactModel();
-  var view = new views.Contact({model:c});
+  var contacts = this.app.request("contact:entities");
+  var view = new views.contact.ContactsView({collection:contacts});
   this.region.show(view);
 }
 
 module.exports = {
   displayContact: displayContact
 };
-},{"../models":6,"../view":8}],3:[function(require,module,exports){
+},{"../view":8}],5:[function(require,module,exports){
 var _ = require('underscore');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
@@ -43,13 +106,14 @@ var Marionette = require('backbone.marionette');
 var Controller = Marionette.Controller.extend({
   initialize: function(options){
     this.region = options.region;
+    this.app = options.app;
   }
 });
 
 _.extend(Controller.prototype, require('./contact'));
 
 module.exports = Controller;
-},{"./contact":2,"backbone":"37npV7","backbone.marionette":"QmbIvk","underscore":"II0/qO"}],4:[function(require,module,exports){
+},{"./contact":4,"backbone":"MquU5q","backbone.marionette":"+Zbygn","underscore":"wbFvxb"}],6:[function(require,module,exports){
 var Controller = require('./controllers');
 
 function ContactModule(module, app, backbone, Marionette, $, _){
@@ -66,55 +130,20 @@ function ContactModule(module, app, backbone, Marionette, $, _){
   module.addInitializer(function(){
     new module.Router({
       controller : new Controller({
-        region: app.mainRegion
+        region: app.mainRegion,
+        app : app
       })
     });
   });
 }
 
 module.exports = ContactModule;
-},{"./controllers":3}],5:[function(require,module,exports){
-var Backbone = require('backbone');
-
-var ContactModel = Backbone.Model.extend({
-
-  // Default attributes
-  defaults: {
-    id: 1,
-    name : 'New Contact'
-  },
-
-  // A dummy initialization method
-  initialize: function() {
-    this.on('change', function(){
-      console.log('ContactModel - Values for this model have changed.');
-    });
-  },
-
-  clear: function() {
-    this.destroy();
-    this.view.remove();
-  }
-
-});
-
-var ContactCollection = Backbone.Collection.extend({
-  model: ContactModel
-});
-
-module.exports = {
-  ContactModel : ContactModel,
-  ContactCollection : ContactCollection
-};
-},{"backbone":"37npV7"}],6:[function(require,module,exports){
-module.exports = {
-  contact : require('./contact')
-};
-},{"./contact":5}],7:[function(require,module,exports){
+},{"./controllers":5}],7:[function(require,module,exports){
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 
 var ContactView = Backbone.Marionette.ItemView.extend({
+  tagName : 'li',
   template: "#tpl-contact",
 
   initialize: function(){
@@ -123,12 +152,20 @@ var ContactView = Backbone.Marionette.ItemView.extend({
   },
 });
 
-module.exports = ContactView;
-},{"backbone":"37npV7","backbone.marionette":"QmbIvk"}],8:[function(require,module,exports){
+var ContactsView = Backbone.Marionette.CollectionView.extend({
+  tagName : 'ul',
+  itemView : ContactView,
+});
+
 module.exports = {
-  Contact : require('./contact')
+  ContactView : ContactView,
+  ContactsView : ContactsView
 };
-},{"./contact":7}],"f9KVs1":[function(require,module,exports){
+},{"backbone":"MquU5q","backbone.marionette":"+Zbygn"}],8:[function(require,module,exports){
+module.exports = {
+  contact : require('./contact')
+};
+},{"./contact":7}],"372n0M":[function(require,module,exports){
 (function (global){(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.Backbone = require("backbone");
@@ -147,11 +184,11 @@ Backbone.ChildViewContainer=function(i,t){var e=function(i){this._views={},this.
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"backbone":"37npV7"}],"backbone.babysitter":[function(require,module,exports){
-module.exports=require('f9KVs1');
+},{"backbone":"MquU5q"}],"backbone.babysitter":[function(require,module,exports){
+module.exports=require('372n0M');
 },{}],"backbone.marionette":[function(require,module,exports){
-module.exports=require('QmbIvk');
-},{}],"QmbIvk":[function(require,module,exports){
+module.exports=require('+Zbygn');
+},{}],"+Zbygn":[function(require,module,exports){
 (function (global){(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.$ = require("jquery");
@@ -182,9 +219,9 @@ Backbone.ChildViewContainer=function(a,b){var c=function(a){this._views={},this.
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"backbone":"37npV7","jquery":"bBWYxq","underscore":"II0/qO"}],"backbone.wreqr":[function(require,module,exports){
-module.exports=require('UzYene');
-},{}],"UzYene":[function(require,module,exports){
+},{"backbone":"MquU5q","jquery":"gsUuyK","underscore":"wbFvxb"}],"backbone.wreqr":[function(require,module,exports){
+module.exports=require('MZZlX1');
+},{}],"MZZlX1":[function(require,module,exports){
 (function (global){(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.Backbone = require("backbone");
@@ -204,9 +241,9 @@ Backbone.Wreqr=function(t,n,e){"use strict";var r={};return r.Handlers=function(
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"backbone":"37npV7"}],"backbone":[function(require,module,exports){
-module.exports=require('37npV7');
-},{}],"37npV7":[function(require,module,exports){
+},{"backbone":"MquU5q"}],"backbone":[function(require,module,exports){
+module.exports=require('MquU5q');
+},{}],"MquU5q":[function(require,module,exports){
 (function (global){(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 
 ; global.underscore = require("underscore");
@@ -216,9 +253,9 @@ module.exports=require('37npV7');
 
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"underscore":"II0/qO"}],"jquery":[function(require,module,exports){
-module.exports=require('bBWYxq');
-},{}],"bBWYxq":[function(require,module,exports){
+},{"underscore":"wbFvxb"}],"jquery":[function(require,module,exports){
+module.exports=require('gsUuyK');
+},{}],"gsUuyK":[function(require,module,exports){
 (function (global){(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 /*! jQuery v1.10.2 | (c) 2005, 2013 jQuery Foundation, Inc. | jquery.org/license
 //@ sourceMappingURL=jquery.min.map
@@ -232,8 +269,8 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
 }).call(global, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],"underscore":[function(require,module,exports){
-module.exports=require('II0/qO');
-},{}],"II0/qO":[function(require,module,exports){
+module.exports=require('wbFvxb');
+},{}],"wbFvxb":[function(require,module,exports){
 (function (global){(function browserifyShim(module, exports, define, browserify_shim__define__module__export__) {
 //     Underscore.js 1.5.2
 //     http://underscorejs.org

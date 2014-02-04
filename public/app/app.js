@@ -6,7 +6,8 @@ var Marionette = require('backbone.marionette');
 var MainApp = new Backbone.Marionette.Application();
 
 // Modules
-MainApp.module('contacts', require('./modules/contacts'));
+MainApp.module('Entities', require('./entities'));
+MainApp.module('Contacts', require('./modules/contacts'));
 
 
 MainApp.addRegions({

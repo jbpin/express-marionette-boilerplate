@@ -2,6 +2,7 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 
 var ContactView = Backbone.Marionette.ItemView.extend({
+  tagName : 'li',
   template: "#tpl-contact",
 
   initialize: function(){
@@ -10,4 +11,12 @@ var ContactView = Backbone.Marionette.ItemView.extend({
   },
 });
 
-module.exports = ContactView;
+var ContactsView = Backbone.Marionette.CollectionView.extend({
+  tagName : 'ul',
+  itemView : ContactView,
+});
+
+module.exports = {
+  ContactView : ContactView,
+  ContactsView : ContactsView
+};

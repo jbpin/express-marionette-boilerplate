@@ -14,7 +14,8 @@ function ContactModule(module, app, backbone, Marionette, $, _){
   module.addInitializer(function(){
     new module.Router({
       controller : new Controller({
-        region: app.mainRegion
+        region: app.mainRegion,
+        app : app
       })
     });
   });

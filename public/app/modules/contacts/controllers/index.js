@@ -5,6 +5,7 @@ var Marionette = require('backbone.marionette');
 var Controller = Marionette.Controller.extend({
   initialize: function(options){
     this.region = options.region;
+    this.app = options.app;
   }
 });
 
